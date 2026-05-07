@@ -139,7 +139,7 @@ export const conversations: Conversation[] = [
     unread: false,
     transcript: [
       { from: "patient", time: "9:42", text: "Hi, I have severe pain in my lower right tooth since last night. Can I get an appointment today?" },
-      { from: "ai", time: "9:42", text: "Hi Priya, sorry to hear that. Based on your symptoms it sounds like you may need a root canal evaluation. Dr. Anaya Kapoor (Endodontist) has an opening today at 3:30 PM at our Bandra West clinic. Would that work?" },
+      { from: "ai", time: "9:42", text: "I'm sorry to hear that. I can help you book the earliest available appointment so the doctor can check it. Dr. Anaya Kapoor (Endodontist) has an opening today at 3:30 PM at our Bandra West clinic. Would that work?" },
       { from: "patient", time: "9:44", text: "Yes please book it." },
       { from: "ai", time: "9:44", text: "Booked ✅ Today, 3:30 PM with Dr. Anaya Kapoor, Bandra West. Consultation fee ₹600, RCT ₹6,500 if proceeded. I'll send a reminder at 2:30 PM." },
       { from: "patient", time: "9:45", text: "Perfect, see you at 3:30!" },

@@ -1,8 +1,12 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { conversations, type Conversation } from "@/lib/mockData";
-import { Search, Filter, MessageCircle, Phone, Sparkles, Link2, ArrowRight, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Search, Phone, Sparkles, Link2, ArrowRight, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
+import { Modal, FormField, inputCls } from "@/components/ui/Modal";
+import { toast } from "sonner";
+import { useAppState } from "@/lib/appState";
+import { useNavigate } from "react-router-dom";
 
 const intentTone: any = { high: "destructive", medium: "warning", low: "muted" };
 const outcomeTone: any = {
@@ -11,14 +15,31 @@ const outcomeTone: any = {
 };
 
 export default function Conversations() {
-  const [selected, setSelected] = useState<Conversation>(conversations[0]);
+  const navigate = useNavigate();
+  const { addTicket } = useAppState();
+  const [convos, setConvos] = useState(conversations);
+  const [selected, setSelected] = useState<Conversation>(convos[0]);
   const [filter, setFilter] = useState<string>("all");
+  const [draft, setDraft] = useState("");
+  const [contactOpen, setContactOpen] = useState(false);
+  const [resolvedIds, setResolvedIds] = useState<Set<string>>(new Set());
 
-  const filtered = filter === "all"
-    ? conversations
-    : filter === "unread"
-    ? conversations.filter((c) => c.unread)
-    : conversations.filter((c) => c.urgency === "high" || c.outcome === "Escalated");
+  const filtered = convos.filter((c) => {
+    if (filter === "unread") return c.unread;
+    if (filter === "emergency") return c.urgency === "high";
+    if (filter === "booked") return c.outcome === "Booked";
+    if (filter === "escalated") return c.outcome === "Escalated";
+    return true;
+  });
+
+  const sendMessage = () => {
+    if (!draft.trim()) return;
+    const updated = { ...selected, transcript: [...selected.transcript, { from: "staff" as const, time: "now", text: draft }], lastMessage: draft };
+    setConvos((arr) => arr.map((c) => c.id === selected.id ? updated : c));
+    setSelected(updated);
+    setDraft("");
+    toast.success("Message sent");
+  };
 
   return (
     <AppShell
@@ -26,20 +47,21 @@ export default function Conversations() {
       subtitle="Every patient message handled by your AI receptionist — with transcripts, summaries, and outcomes."
     >
       <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-5 h-[calc(100vh-10rem)]">
-        {/* List */}
         <div className="surface-card flex flex-col overflow-hidden">
           <div className="p-3 border-b border-border space-y-2">
             <div className="flex items-center gap-2 px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground-muted">
               <Search className="w-4 h-4" />
               <input className="bg-transparent outline-none flex-1 text-foreground" placeholder="Search conversations" />
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-1 flex-wrap">
               {[
                 { id: "all", l: "All" },
                 { id: "unread", l: "Unread" },
-                { id: "urgent", l: "Urgent" },
+                { id: "emergency", l: "Emergency" },
+                { id: "booked", l: "Booked" },
+                { id: "escalated", l: "Escalated" },
               ].map((f) => (
-                <button key={f.id} onClick={() => setFilter(f.id)} className={`flex-1 text-[11px] font-semibold py-1.5 rounded-md ${filter === f.id ? "bg-teal/10 text-teal" : "text-foreground-muted hover:bg-muted"}`}>{f.l}</button>
+                <button key={f.id} onClick={() => setFilter(f.id)} className={`text-[11px] font-semibold px-2.5 py-1.5 rounded-md ${filter === f.id ? "bg-teal/10 text-teal" : "text-foreground-muted hover:bg-muted"}`}>{f.l}</button>
               ))}
             </div>
           </div>
@@ -59,7 +81,7 @@ export default function Conversations() {
                     </div>
                     <div className="text-[11px] text-foreground-muted truncate mt-0.5">{c.lastMessage}</div>
                     <div className="flex items-center gap-1 mt-1.5">
-                      <StatusBadge tone={intentTone[c.urgency]}>{c.channel}</StatusBadge>
+                      <StatusBadge tone={intentTone[c.urgency]}>{c.urgency === "high" ? "Emergency" : c.channel}</StatusBadge>
                       <StatusBadge tone={outcomeTone[c.outcome]}>{c.outcome}</StatusBadge>
                     </div>
                   </div>
@@ -69,7 +91,6 @@ export default function Conversations() {
           </div>
         </div>
 
-        {/* Detail */}
         <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-5 min-h-0">
           <div className="surface-card flex flex-col overflow-hidden">
             <div className="p-4 border-b border-border flex items-center gap-3">
@@ -80,8 +101,8 @@ export default function Conversations() {
                 <div className="font-semibold text-foreground">{selected.patient}</div>
                 <div className="text-[11px] text-foreground-muted">{selected.phone} · {selected.channel} · {selected.startedAt}</div>
               </div>
-              <StatusBadge tone={outcomeTone[selected.outcome]} dot>{selected.outcome}</StatusBadge>
-              <button className="text-xs font-semibold px-2.5 py-1.5 rounded-md border border-border bg-card hover:bg-muted text-foreground inline-flex items-center gap-1">
+              <StatusBadge tone={resolvedIds.has(selected.id) ? "success" : outcomeTone[selected.outcome]} dot>{resolvedIds.has(selected.id) ? "Resolved" : selected.outcome}</StatusBadge>
+              <button onClick={() => setContactOpen(true)} className="text-xs font-semibold px-2.5 py-1.5 rounded-md border border-border bg-card hover:bg-muted text-foreground inline-flex items-center gap-1">
                 <Phone className="w-3.5 h-3.5" /> Call
               </button>
             </div>
@@ -99,7 +120,7 @@ export default function Conversations() {
                     }`}>
                       {!isPatient && (
                         <div className="text-[10px] font-bold uppercase tracking-wider mb-0.5 opacity-70">
-                          {isAI ? "AppointNowX" : "Front Desk"}
+                          {isAI ? "AppointNowX Agent" : "Front Desk"}
                         </div>
                       )}
                       <div className="leading-relaxed">{m.text}</div>
@@ -111,12 +132,11 @@ export default function Conversations() {
             </div>
 
             <div className="p-3 border-t border-border bg-card flex items-center gap-2">
-              <input placeholder="Send a message as front desk…" className="flex-1 px-3 py-2 bg-surface border border-border rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal" />
-              <button className="text-xs font-semibold px-3.5 py-2 rounded-lg bg-gradient-brand text-white">Send</button>
+              <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendMessage()} placeholder="Send a message as front desk…" className="flex-1 px-3 py-2 bg-surface border border-border rounded-lg text-sm outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal" />
+              <button onClick={sendMessage} className="text-xs font-semibold px-3.5 py-2 rounded-lg bg-gradient-brand text-white">Send</button>
             </div>
           </div>
 
-          {/* AI Summary panel */}
           <div className="space-y-4 overflow-y-auto scroll-clean">
             <div className="surface-card p-4">
               <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-teal font-bold mb-2">
@@ -128,9 +148,9 @@ export default function Conversations() {
             <div className="surface-card p-4">
               <div className="text-[11px] uppercase tracking-wider text-foreground-muted font-bold mb-2">Detected intent</div>
               <StatusBadge tone="teal">{selected.intent}</StatusBadge>
-              <div className="mt-3 text-[11px] uppercase tracking-wider text-foreground-muted font-bold mb-2">Urgency</div>
+              <div className="mt-3 text-[11px] uppercase tracking-wider text-foreground-muted font-bold mb-2">Priority</div>
               <StatusBadge tone={intentTone[selected.urgency]} dot>
-                {selected.urgency.toUpperCase()}
+                {selected.urgency === "high" ? "EMERGENCY" : selected.urgency.toUpperCase()}
               </StatusBadge>
             </div>
 
@@ -147,7 +167,7 @@ export default function Conversations() {
             </div>
 
             {selected.linkedBookingId ? (
-              <div className="surface-card p-4">
+              <button onClick={() => navigate("/app/bookings")} className="surface-card p-4 w-full text-left hover:shadow-elev transition">
                 <div className="text-[11px] uppercase tracking-wider text-foreground-muted font-bold mb-2 flex items-center gap-1"><Link2 className="w-3 h-3" /> Linked booking</div>
                 <div className="flex items-center justify-between">
                   <div>
@@ -156,7 +176,7 @@ export default function Conversations() {
                   </div>
                   <ArrowRight className="w-4 h-4 text-teal" />
                 </div>
-              </div>
+              </button>
             ) : (
               <div className="surface-card p-4">
                 <div className="text-[11px] uppercase tracking-wider text-warning font-bold mb-2 flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> No booking created</div>
@@ -165,12 +185,21 @@ export default function Conversations() {
             )}
 
             <div className="grid grid-cols-2 gap-2">
-              <button className="text-xs font-semibold py-2 rounded-lg bg-success text-success-foreground inline-flex items-center justify-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5"/> Mark resolved</button>
-              <button className="text-xs font-semibold py-2 rounded-lg bg-card border border-border text-foreground">Escalate</button>
+              <button onClick={() => { setResolvedIds((s) => new Set([...s, selected.id])); toast.success("Marked resolved"); }} className="text-xs font-semibold py-2 rounded-lg bg-success text-success-foreground inline-flex items-center justify-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5"/> Mark resolved</button>
+              <button onClick={() => { addTicket({ subject: `Escalation: ${selected.patient}`, owner: "Support team", status: "Open", category: "AI feedback" }); toast.success("Escalated to support"); }} className="text-xs font-semibold py-2 rounded-lg bg-card border border-border text-foreground">Escalate</button>
             </div>
           </div>
         </div>
       </div>
+
+      <Modal open={contactOpen} onClose={() => setContactOpen(false)} title={`Contact ${selected.patient}`} subtitle={selected.phone}
+        footer={<>
+          <button onClick={() => setContactOpen(false)} className="text-xs font-semibold px-3.5 py-2 rounded-lg border border-border bg-card text-foreground">Close</button>
+          <button onClick={() => { toast.success("Calling patient…"); setContactOpen(false); }} className="text-xs font-semibold px-3.5 py-2 rounded-lg bg-gradient-brand text-white inline-flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> Start call</button>
+        </>}
+      >
+        <FormField label="Quick note (logged with conversation)"><textarea className={inputCls} rows={3} placeholder="Followed up regarding…" /></FormField>
+      </Modal>
     </AppShell>
   );
 }
