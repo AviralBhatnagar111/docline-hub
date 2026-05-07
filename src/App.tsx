@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WorkspaceProvider } from "@/lib/workspace";
+import { AppStateProvider } from "@/lib/appState";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -13,7 +14,7 @@ import Calendar from "./pages/clinic/Calendar";
 import Conversations from "./pages/clinic/Conversations";
 import Doctors from "./pages/clinic/Doctors";
 import Services from "./pages/clinic/Services";
-import Availability from "./pages/clinic/Availability";
+
 import Profile from "./pages/clinic/Profile";
 import Team from "./pages/clinic/Team";
 import Integrations from "./pages/clinic/Integrations";
@@ -37,6 +38,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <WorkspaceProvider>
+        <AppStateProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Login />} />
@@ -48,7 +50,7 @@ const App = () => (
             <Route path="/app/conversations" element={<Conversations />} />
             <Route path="/app/doctors" element={<Doctors />} />
             <Route path="/app/services" element={<Services />} />
-            <Route path="/app/availability" element={<Availability />} />
+            
             <Route path="/app/profile" element={<Profile />} />
             <Route path="/app/team" element={<Team />} />
             <Route path="/app/integrations" element={<Integrations />} />
@@ -71,6 +73,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        </AppStateProvider>
       </WorkspaceProvider>
     </TooltipProvider>
   </QueryClientProvider>
