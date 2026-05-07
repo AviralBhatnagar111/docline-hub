@@ -72,7 +72,7 @@ export default function Profile() {
               <ShieldCheck className="w-4 h-4 text-success" />
               <span className="font-display font-semibold text-foreground">Verification</span>
             </div>
-            <StatusBadge tone="success" dot>Verified by DocLine</StatusBadge>
+            <StatusBadge tone="success" dot>Verified by AppointNowX</StatusBadge>
             <div className="text-xs text-foreground-muted mt-2">Verified Mar 12, 2026 by Priya M.</div>
             <div className="border-t border-border mt-4 pt-4 space-y-2 text-xs">
               <div className="flex items-center gap-2"><CheckCircle2 className="w-3.5 h-3.5 text-success"/> Clinic license</div>

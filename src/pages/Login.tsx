@@ -27,7 +27,7 @@ export default function Login() {
               <FileCheck2 className="w-6 h-6" />
             </div>
             <div>
-              <div className="font-display font-bold text-xl">DocLine AI</div>
+              <div className="font-display font-bold text-xl">AppointNowX</div>
               <div className="text-xs text-white/70">AI Front-Desk for Dental Clinics</div>
             </div>
           </div>
@@ -40,7 +40,7 @@ export default function Login() {
               Let your AI receptionist handle every patient message — you stay in control.
             </h2>
             <p className="text-white/75 text-[15px] leading-relaxed">
-              DocLine AI books, reschedules, and answers patient queries on WhatsApp 24/7,
+              AppointNowX books, reschedules, and answers patient queries on WhatsApp 24/7,
               and gives your clinic a single hub to review every conversation, summary, and appointment.
             </p>
 
@@ -60,7 +60,7 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="text-xs text-white/50">© 2026 DocLine AI · Built for dental practices</div>
+          <div className="text-xs text-white/50">© 2026 AppointNowX · Built for dental practices</div>
         </div>
       </div>
 
@@ -71,7 +71,7 @@ export default function Login() {
             <div className="w-10 h-10 rounded-xl bg-gradient-teal flex items-center justify-center">
               <FileCheck2 className="w-5 h-5 text-white" />
             </div>
-            <span className="font-display font-bold text-lg text-foreground">DocLine AI</span>
+            <span className="font-display font-bold text-lg text-foreground">AppointNowX</span>
           </div>
 
           <h1 className="text-2xl font-display font-bold text-foreground">Sign in to continue</h1>

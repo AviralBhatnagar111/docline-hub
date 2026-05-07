@@ -1,4 +1,4 @@
-// Mock data for DocLine AI prototype
+// Mock data for AppointNowX prototype
 
 export type Workspace = "clinic" | "internal";
 export type ClinicRole = "owner" | "front_desk" | "doctor" | "manager";

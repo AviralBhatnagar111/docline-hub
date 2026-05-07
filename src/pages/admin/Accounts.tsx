@@ -16,7 +16,7 @@ const vTone: any = { Verified: "success", "In review": "teal", "Needs docs": "wa
 
 export default function Accounts() {
   return (
-    <AppShell title="Clinic Accounts" subtitle="Every active and onboarding clinic on DocLine AI.">
+    <AppShell title="Clinic Accounts" subtitle="Every active and onboarding clinic on AppointNowX.">
       <div className="surface-card overflow-hidden">
         <div className="flex items-center gap-2 p-4 border-b border-border bg-surface">
           <div className="flex items-center gap-2 px-3 py-2 flex-1 max-w-md bg-card border border-border rounded-lg text-sm">

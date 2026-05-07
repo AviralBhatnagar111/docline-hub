@@ -39,7 +39,7 @@ export default function AgentQA() {
               return (
                 <div key={i} className={`flex ${isPatient ? "justify-end" : "justify-start"}`}>
                   <div className={`max-w-[75%] rounded-2xl px-3.5 py-2 text-sm ${isPatient ? "bg-teal text-teal-foreground" : "bg-card border border-border text-foreground"}`}>
-                    {!isPatient && <div className="text-[10px] font-bold uppercase opacity-70 mb-0.5">DocLine AI</div>}
+                    {!isPatient && <div className="text-[10px] font-bold uppercase opacity-70 mb-0.5">AppointNowX</div>}
                     {m.text}
                   </div>
                 </div>

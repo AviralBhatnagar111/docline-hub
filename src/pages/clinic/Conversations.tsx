@@ -99,7 +99,7 @@ export default function Conversations() {
                     }`}>
                       {!isPatient && (
                         <div className="text-[10px] font-bold uppercase tracking-wider mb-0.5 opacity-70">
-                          {isAI ? "DocLine AI" : "Front Desk"}
+                          {isAI ? "AppointNowX" : "Front Desk"}
                         </div>
                       )}
                       <div className="leading-relaxed">{m.text}</div>

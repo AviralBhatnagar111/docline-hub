@@ -49,7 +49,7 @@ export function AppSidebar() {
             <FileCheck2 className="w-5 h-5 text-white" />
           </div>
           <div>
-            <div className="font-display font-bold text-white text-[15px] leading-tight">DocLine AI</div>
+            <div className="font-display font-bold text-white text-[15px] leading-tight">AppointNowX</div>
             <div className="text-[11px] text-sidebar-foreground/70 leading-tight">
               {workspace === "clinic" ? "Clinic Hub" : "Internal Console"}
             </div>
