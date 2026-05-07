@@ -20,10 +20,10 @@ export default function Reports() {
   return (
     <AppShell title="Reports" subtitle="Practical metrics — bookings, conversions, providers and unresolved cases.">
       <div className="stat-grid mb-5">
-        <StatCard label="Bookings (last 7d)" value="218" hint="vs 184 prev week" icon={CalendarCheck} tone="teal" trend={{ dir: "up", value: "+18.5%" }} />
-        <StatCard label="AI conversations" value="412" hint="92% AI-resolved" icon={MessagesSquare} trend={{ dir: "up", value: "+9%" }} />
-        <StatCard label="Cancellation rate" value="6.2%" hint="-1.4% vs last week" icon={XCircle} tone="warning" trend={{ dir: "down", value: "-1.4%" }} />
-        <StatCard label="Avg response time" value="42s" hint="AI first reply" icon={Clock} tone="success" trend={{ dir: "down", value: "-12s" }} />
+        <button onClick={() => alert("Booking report — last 7 days: 218 bookings, 92% AI handled")} className="text-left"><StatCard label="Bookings (last 7d)" value="218" hint="vs 184 prev week" icon={CalendarCheck} tone="teal" trend={{ dir: "up", value: "+18.5%" }} /></button>
+        <button onClick={() => alert("AI conversations report: 412 total, 92% resolved by AI")} className="text-left"><StatCard label="AI conversations" value="412" hint="92% AI-resolved" icon={MessagesSquare} trend={{ dir: "up", value: "+9%" }} /></button>
+        <button onClick={() => alert("Cancellation breakdown: 6.2% rate, 14 cancellations this week")} className="text-left"><StatCard label="Cancellation rate" value="6.2%" hint="-1.4% vs last week" icon={XCircle} tone="warning" trend={{ dir: "down", value: "-1.4%" }} /></button>
+        <button onClick={() => alert("Response performance: 42s avg first reply, P95 1m 18s")} className="text-left"><StatCard label="Avg response time" value="42s" hint="AI first reply" icon={Clock} tone="success" trend={{ dir: "down", value: "-12s" }} /></button>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">

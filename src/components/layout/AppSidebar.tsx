@@ -14,7 +14,7 @@ const clinicNav = [
   { to: "/app/conversations", label: "Conversations", icon: MessagesSquare, badge: "3" },
   { to: "/app/doctors", label: "Doctors", icon: Stethoscope },
   { to: "/app/services", label: "Services & Fees", icon: Sparkles },
-  { to: "/app/availability", label: "Availability & Rules", icon: Settings2 },
+  
   { to: "/app/profile", label: "Clinic Profile", icon: Building2 },
   { to: "/app/team", label: "Team & Access", icon: Users },
   { to: "/app/integrations", label: "Integrations", icon: Plug },
@@ -49,7 +49,7 @@ export function AppSidebar() {
             <FileCheck2 className="w-5 h-5 text-white" />
           </div>
           <div>
-            <div className="font-display font-bold text-white text-[15px] leading-tight">DocLine AI</div>
+            <div className="font-display font-bold text-white text-[15px] leading-tight">AppointNowX</div>
             <div className="text-[11px] text-sidebar-foreground/70 leading-tight">
               {workspace === "clinic" ? "Clinic Hub" : "Internal Console"}
             </div>
