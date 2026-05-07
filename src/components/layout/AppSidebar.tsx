@@ -14,7 +14,7 @@ const clinicNav = [
   { to: "/app/conversations", label: "Conversations", icon: MessagesSquare, badge: "3" },
   { to: "/app/doctors", label: "Doctors", icon: Stethoscope },
   { to: "/app/services", label: "Services & Fees", icon: Sparkles },
-  { to: "/app/availability", label: "Availability & Rules", icon: Settings2 },
+  
   { to: "/app/profile", label: "Clinic Profile", icon: Building2 },
   { to: "/app/team", label: "Team & Access", icon: Users },
   { to: "/app/integrations", label: "Integrations", icon: Plug },
