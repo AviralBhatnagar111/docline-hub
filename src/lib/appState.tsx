@@ -128,6 +128,8 @@ const seedNotifications: Notification[] = [
   { id: "n4", type: "reschedule", title: "Reschedule requested", body: "Mohit Jain — wants 4 PM slot tomorrow", time: "1 hr ago", unread: false, cta: { label: "Open conversation", to: "/app/conversations" } },
   { id: "n5", type: "cancel", title: "Patient cancelled", body: "Sneha Patil cancelled implant on Apr 14 (travel)", time: "3 hr ago", unread: false, cta: { label: "View booking", to: "/app/bookings" } },
   { id: "n6", type: "doctor", title: "Doctor updated availability", body: "Dr. Vikram Shah marked himself on leave", time: "Yesterday", unread: false },
+  { id: "n7", type: "emergency", title: "Call Agent missed handoff", body: "Inbound call dropped at 12:04 PM — needs follow-up", time: "20 min ago", unread: true, cta: { label: "Open call log", to: "/app/conversations" } },
+  { id: "n8", type: "booking", title: "Onboarding request received", body: "Smile Studio Dental — Bengaluru", time: "1 hr ago", unread: true, cta: { label: "Open lead", to: "/admin/leads" } },
 ];
 
 interface AppStateCtx {
