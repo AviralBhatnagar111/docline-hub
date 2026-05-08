@@ -1,15 +1,18 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { clinicLeads } from "@/lib/mockData";
-import { Plus, Search, MoreHorizontal } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Sparkles } from "lucide-react";
+import { useAppState } from "@/lib/appState";
 
 const stageTone: any = {
   "New Lead": "muted", "Contacted": "teal", "Demo Scheduled": "primary",
   "Onboarding": "warning", "Pending Verification": "warning", "Activated": "success",
+  "New request": "warning",
 };
 const sizeTone: any = { "Solo": "muted", "Single Clinic": "teal", "Multi-location": "primary" };
 
 export default function Leads() {
+  const { onboardingRequests } = useAppState();
   return (
     <AppShell title="Clinic Leads & Requests" subtitle="Inbound clinic interest and onboarding pipeline." actions={
       <button className="inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 h-10 rounded-lg bg-gradient-brand text-white shadow-soft">
