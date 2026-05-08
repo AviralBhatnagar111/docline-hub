@@ -1,9 +1,10 @@
-import { Search, Bell, ChevronDown, Sparkles, Pause, Play, MessageCircle, Phone, AlertTriangle, CalendarX, CheckCheck } from "lucide-react";
-import { useWorkspace, clinicRoleLabel, internalRoleLabel } from "@/lib/workspace";
+import { Search, Bell, Sparkles, Pause, Play, MessageCircle, Phone, AlertTriangle, CalendarX, CheckCheck, Inbox, PhoneMissed } from "lucide-react";
+import { useWorkspace } from "@/lib/workspace";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAppState, type AIPauseScope } from "@/lib/appState";
 import { Modal } from "@/components/ui/Modal";
+import { AccountMenu } from "./AccountMenu";
 import { toast } from "sonner";
 
 export function AppHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: React.ReactNode }) {
