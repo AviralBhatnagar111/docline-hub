@@ -63,6 +63,64 @@ const seedTickets: Ticket[] = [
   { id: "T-1810", subject: "AI greeting tone update", owner: "Aditi R.", status: "Resolved", category: "AI feedback", updated: "3 days ago" },
 ];
 
+export interface OnboardingRequest {
+  id: string;
+  clinicName: string;
+  practiceType: string;
+  specialty: string;
+  yearEstablished: string;
+  website: string;
+  about: string;
+  contactName: string;
+  contactRole: string;
+  email: string;
+  mobile: string;
+  preferredChannel: string;
+  preferredTime: string;
+  locations: { name: string; address: string; city: string; state: string; country: string; pincode: string; phone: string }[];
+  doctorCount: string;
+  doctorList: string;
+  services: string[];
+  avgFee: string;
+  pricingVaries: string;
+  workingDays: string;
+  workingHours: string;
+  breakTime: string;
+  sameDay: string;
+  emergency: string;
+  slotStyle: string;
+  currentBooking: string;
+  channels: string[];
+  hasWA: string;
+  hasPhone: string;
+  calendar: string;
+  needSetupHelp: string;
+  licenseNo: string;
+  doctorRegNo: string;
+  gst: string;
+  notes: string;
+  submittedAt: string;
+  status: "New request" | "In review" | "Contacted";
+  source: string;
+}
+
+export interface NotificationPrefs {
+  newBooking: boolean;
+  emergency: boolean;
+  cancel: boolean;
+  reschedule: boolean;
+  syncIssue: boolean;
+  aiIssue: boolean;
+  dailySummary: boolean;
+  whatsappAlerts: boolean;
+  emailAlerts: boolean;
+}
+
+const defaultPrefs: NotificationPrefs = {
+  newBooking: true, emergency: true, cancel: true, reschedule: true,
+  syncIssue: true, aiIssue: true, dailySummary: true, whatsappAlerts: false, emailAlerts: true,
+};
+
 const seedNotifications: Notification[] = [
   { id: "n1", type: "emergency", title: "Emergency booking flagged", body: "Ravi Krishnan — severe wisdom tooth pain, booked 6 PM", time: "8 min ago", unread: true, cta: { label: "Review emergency", to: "/app/bookings" } },
   { id: "n2", type: "booking", title: "New booking by WhatsApp Agent", body: "Arjun Desai — Consultation with Dr. Mehta, 4:15 PM", time: "12 min ago", unread: true, cta: { label: "View booking", to: "/app/bookings" } },
@@ -70,6 +128,8 @@ const seedNotifications: Notification[] = [
   { id: "n4", type: "reschedule", title: "Reschedule requested", body: "Mohit Jain — wants 4 PM slot tomorrow", time: "1 hr ago", unread: false, cta: { label: "Open conversation", to: "/app/conversations" } },
   { id: "n5", type: "cancel", title: "Patient cancelled", body: "Sneha Patil cancelled implant on Apr 14 (travel)", time: "3 hr ago", unread: false, cta: { label: "View booking", to: "/app/bookings" } },
   { id: "n6", type: "doctor", title: "Doctor updated availability", body: "Dr. Vikram Shah marked himself on leave", time: "Yesterday", unread: false },
+  { id: "n7", type: "emergency", title: "Call Agent missed handoff", body: "Inbound call dropped at 12:04 PM — needs follow-up", time: "20 min ago", unread: true, cta: { label: "Open call log", to: "/app/conversations" } },
+  { id: "n8", type: "booking", title: "Onboarding request received", body: "Smile Studio Dental — Bengaluru", time: "1 hr ago", unread: true, cta: { label: "Open lead", to: "/admin/leads" } },
 ];
 
 interface AppStateCtx {
@@ -104,6 +164,14 @@ interface AppStateCtx {
 
   blockedSlots: { id: string; doctor: string; location: string; date: string; start: string; end: string; reason: string }[];
   addBlock: (b: Omit<AppStateCtx["blockedSlots"][number], "id">) => void;
+
+  onboardingRequests: OnboardingRequest[];
+  addOnboardingRequest: (r: Omit<OnboardingRequest, "id" | "submittedAt" | "status" | "source">) => OnboardingRequest;
+
+  notifPrefs: NotificationPrefs;
+  setNotifPrefs: (p: NotificationPrefs) => void;
+
+  pushNotification: (n: Omit<Notification, "id" | "time" | "unread">) => void;
 }
 
 const Ctx = createContext<AppStateCtx | null>(null);
@@ -118,6 +186,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const [team, setTeam] = useState(seedTeam);
   const [tickets, setTickets] = useState(seedTickets);
   const [blockedSlots, setBlockedSlots] = useState<AppStateCtx["blockedSlots"]>([]);
+  const [onboardingRequests, setOnboardingRequests] = useState<OnboardingRequest[]>([]);
+  const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>(defaultPrefs);
 
   const markAllRead = useCallback(() => setNotifications((n) => n.map((x) => ({ ...x, unread: false }))), []);
   const addDoctor = (d: Omit<Doctor, "id">) => setDoctors((arr) => [...arr, { ...d, id: `d${Date.now()}` }]);
@@ -138,6 +208,16 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const addBlock = (b: Omit<AppStateCtx["blockedSlots"][number], "id">) =>
     setBlockedSlots((arr) => [...arr, { ...b, id: `bk${Date.now()}` }]);
 
+  const pushNotification = (n: Omit<Notification, "id" | "time" | "unread">) =>
+    setNotifications((arr) => [{ ...n, id: `n${Date.now()}`, time: "Just now", unread: true }, ...arr]);
+
+  const addOnboardingRequest = (r: Omit<OnboardingRequest, "id" | "submittedAt" | "status" | "source">) => {
+    const created: OnboardingRequest = { ...r, id: `or${Date.now()}`, submittedAt: "Just now", status: "New request", source: "Website onboarding form" };
+    setOnboardingRequests((arr) => [created, ...arr]);
+    pushNotification({ type: "booking", title: "Onboarding request received", body: `${r.clinicName} — ${r.contactName}`, cta: { label: "Open lead", to: "/admin/leads" } });
+    return created;
+  };
+
   return (
     <Ctx.Provider value={{
       aiPause, setAiPause,
@@ -149,6 +229,9 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       team, addTeam, removeTeam, updateTeam,
       tickets, addTicket,
       blockedSlots, addBlock,
+      onboardingRequests, addOnboardingRequest,
+      notifPrefs, setNotifPrefs,
+      pushNotification,
     }}>
       {children}
     </Ctx.Provider>
