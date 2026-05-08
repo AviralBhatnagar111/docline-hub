@@ -63,6 +63,64 @@ const seedTickets: Ticket[] = [
   { id: "T-1810", subject: "AI greeting tone update", owner: "Aditi R.", status: "Resolved", category: "AI feedback", updated: "3 days ago" },
 ];
 
+export interface OnboardingRequest {
+  id: string;
+  clinicName: string;
+  practiceType: string;
+  specialty: string;
+  yearEstablished: string;
+  website: string;
+  about: string;
+  contactName: string;
+  contactRole: string;
+  email: string;
+  mobile: string;
+  preferredChannel: string;
+  preferredTime: string;
+  locations: { name: string; address: string; city: string; state: string; country: string; pincode: string; phone: string }[];
+  doctorCount: string;
+  doctorList: string;
+  services: string[];
+  avgFee: string;
+  pricingVaries: string;
+  workingDays: string;
+  workingHours: string;
+  breakTime: string;
+  sameDay: string;
+  emergency: string;
+  slotStyle: string;
+  currentBooking: string;
+  channels: string[];
+  hasWA: string;
+  hasPhone: string;
+  calendar: string;
+  needSetupHelp: string;
+  licenseNo: string;
+  doctorRegNo: string;
+  gst: string;
+  notes: string;
+  submittedAt: string;
+  status: "New request" | "In review" | "Contacted";
+  source: string;
+}
+
+export interface NotificationPrefs {
+  newBooking: boolean;
+  emergency: boolean;
+  cancel: boolean;
+  reschedule: boolean;
+  syncIssue: boolean;
+  aiIssue: boolean;
+  dailySummary: boolean;
+  whatsappAlerts: boolean;
+  emailAlerts: boolean;
+}
+
+const defaultPrefs: NotificationPrefs = {
+  newBooking: true, emergency: true, cancel: true, reschedule: true,
+  syncIssue: true, aiIssue: true, dailySummary: true, whatsappAlerts: false, emailAlerts: true,
+};
+
 const seedNotifications: Notification[] = [
   { id: "n1", type: "emergency", title: "Emergency booking flagged", body: "Ravi Krishnan — severe wisdom tooth pain, booked 6 PM", time: "8 min ago", unread: true, cta: { label: "Review emergency", to: "/app/bookings" } },
   { id: "n2", type: "booking", title: "New booking by WhatsApp Agent", body: "Arjun Desai — Consultation with Dr. Mehta, 4:15 PM", time: "12 min ago", unread: true, cta: { label: "View booking", to: "/app/bookings" } },
