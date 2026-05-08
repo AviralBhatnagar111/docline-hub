@@ -123,44 +123,8 @@ export function AppHeader({ title, subtitle, actions }: { title: string; subtitl
             )}
           </div>
 
-          <div className="relative">
-            <button onClick={() => setOpen(!open)} className="flex items-center gap-2 px-3 h-10 rounded-lg border border-border bg-card hover:bg-muted">
-              <Sparkles className="w-4 h-4 text-teal" />
-              <div className="text-left hidden sm:block">
-                <div className="text-[11px] text-foreground-muted leading-none">Workspace</div>
-                <div className="text-xs font-semibold text-foreground leading-tight">
-                  {workspace === "clinic" ? "Clinic Hub" : "Internal Console"}
-                </div>
-              </div>
-              <ChevronDown className="w-3.5 h-3.5 text-foreground-muted" />
-            </button>
-            {open && (
-              <div className="absolute right-0 top-12 w-72 bg-popover border border-border rounded-xl shadow-elev p-2 animate-fade-in z-50">
-                <div className="px-2 py-1.5 text-[10px] uppercase tracking-wider text-foreground-muted">Switch workspace</div>
-                <button onClick={() => switchWorkspace("clinic")} className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-muted">
-                  <div className="text-sm font-semibold text-foreground">Clinic Hub</div>
-                  <div className="text-[11px] text-foreground-muted">Practice operations & AI receptionist</div>
-                </button>
-                <button onClick={() => switchWorkspace("internal")} className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-muted">
-                  <div className="text-sm font-semibold text-foreground">Internal Admin Console</div>
-                  <div className="text-[11px] text-foreground-muted">Onboarding, verification, QA & support</div>
-                </button>
-                <div className="border-t border-border my-2" />
-                <div className="px-2 py-1.5 text-[10px] uppercase tracking-wider text-foreground-muted">Switch role</div>
-                {workspace === "clinic"
-                  ? (Object.keys(clinicRoleLabel) as Array<keyof typeof clinicRoleLabel>).map((r) => (
-                      <button key={r} onClick={() => { setRole(r); setOpen(false); }} className={`w-full text-left px-3 py-1.5 rounded-lg hover:bg-muted text-xs ${role === r ? "bg-teal/10 text-teal font-semibold" : "text-foreground"}`}>
-                        {clinicRoleLabel[r]}
-                      </button>
-                    ))
-                  : (Object.keys(internalRoleLabel) as Array<keyof typeof internalRoleLabel>).map((r) => (
-                      <button key={r} onClick={() => { setRole(r); setOpen(false); }} className={`w-full text-left px-3 py-1.5 rounded-lg hover:bg-muted text-xs ${role === r ? "bg-teal/10 text-teal font-semibold" : "text-foreground"}`}>
-                        {internalRoleLabel[r]}
-                      </button>
-                    ))}
-              </div>
-            )}
-          </div>
+          <AccountMenu />
+
         </div>
 
         {workspace === "clinic" && isPaused && (
