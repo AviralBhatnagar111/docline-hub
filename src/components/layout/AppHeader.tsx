@@ -8,20 +8,12 @@ import { AccountMenu } from "./AccountMenu";
 import { toast } from "sonner";
 
 export function AppHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: React.ReactNode }) {
-  const { workspace, role, setWorkspace, setRole } = useWorkspace();
+  const { workspace } = useWorkspace();
   const { aiPause, setAiPause, notifications, markAllRead } = useAppState();
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [pauseModal, setPauseModal] = useState(false);
   const [scope, setScope] = useState<AIPauseScope>("all");
-
-  const switchWorkspace = (w: "clinic" | "internal") => {
-    setWorkspace(w);
-    setRole(w === "clinic" ? "owner" : "platform_admin");
-    navigate(w === "clinic" ? "/app" : "/admin");
-    setOpen(false);
-  };
 
   const isPaused = aiPause !== "none";
   const unreadCount = notifications.filter((n) => n.unread).length;
