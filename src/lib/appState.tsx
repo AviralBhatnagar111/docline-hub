@@ -162,6 +162,14 @@ interface AppStateCtx {
 
   blockedSlots: { id: string; doctor: string; location: string; date: string; start: string; end: string; reason: string }[];
   addBlock: (b: Omit<AppStateCtx["blockedSlots"][number], "id">) => void;
+
+  onboardingRequests: OnboardingRequest[];
+  addOnboardingRequest: (r: Omit<OnboardingRequest, "id" | "submittedAt" | "status" | "source">) => OnboardingRequest;
+
+  notifPrefs: NotificationPrefs;
+  setNotifPrefs: (p: NotificationPrefs) => void;
+
+  pushNotification: (n: Omit<Notification, "id" | "time" | "unread">) => void;
 }
 
 const Ctx = createContext<AppStateCtx | null>(null);
@@ -176,6 +184,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const [team, setTeam] = useState(seedTeam);
   const [tickets, setTickets] = useState(seedTickets);
   const [blockedSlots, setBlockedSlots] = useState<AppStateCtx["blockedSlots"]>([]);
+  const [onboardingRequests, setOnboardingRequests] = useState<OnboardingRequest[]>([]);
+  const [notifPrefs, setNotifPrefs] = useState<NotificationPrefs>(defaultPrefs);
 
   const markAllRead = useCallback(() => setNotifications((n) => n.map((x) => ({ ...x, unread: false }))), []);
   const addDoctor = (d: Omit<Doctor, "id">) => setDoctors((arr) => [...arr, { ...d, id: `d${Date.now()}` }]);
@@ -196,6 +206,16 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const addBlock = (b: Omit<AppStateCtx["blockedSlots"][number], "id">) =>
     setBlockedSlots((arr) => [...arr, { ...b, id: `bk${Date.now()}` }]);
 
+  const pushNotification = (n: Omit<Notification, "id" | "time" | "unread">) =>
+    setNotifications((arr) => [{ ...n, id: `n${Date.now()}`, time: "Just now", unread: true }, ...arr]);
+
+  const addOnboardingRequest = (r: Omit<OnboardingRequest, "id" | "submittedAt" | "status" | "source">) => {
+    const created: OnboardingRequest = { ...r, id: `or${Date.now()}`, submittedAt: "Just now", status: "New request", source: "Website onboarding form" };
+    setOnboardingRequests((arr) => [created, ...arr]);
+    pushNotification({ type: "booking", title: "Onboarding request received", body: `${r.clinicName} — ${r.contactName}`, cta: { label: "Open lead", to: "/admin/leads" } });
+    return created;
+  };
+
   return (
     <Ctx.Provider value={{
       aiPause, setAiPause,
@@ -207,6 +227,9 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       team, addTeam, removeTeam, updateTeam,
       tickets, addTicket,
       blockedSlots, addBlock,
+      onboardingRequests, addOnboardingRequest,
+      notifPrefs, setNotifPrefs,
+      pushNotification,
     }}>
       {children}
     </Ctx.Provider>
