@@ -132,9 +132,15 @@ const seedNotifications: Notification[] = [
   { id: "n8", type: "booking", title: "Onboarding request received", body: "Smile Studio Dental — Bengaluru", time: "1 hr ago", unread: true, cta: { label: "Open lead", to: "/admin/leads" } },
 ];
 
+export type AgentKind = "whatsapp" | "call";
+
 interface AppStateCtx {
   aiPause: AIPauseScope;
   setAiPause: (s: AIPauseScope) => void;
+  whatsappPaused: boolean;
+  callPaused: boolean;
+  pauseAgent: (scope: AIPauseScope) => void;
+  resumeAgent: (kind: AgentKind | "all") => void;
 
   notifications: Notification[];
   markAllRead: () => void;
