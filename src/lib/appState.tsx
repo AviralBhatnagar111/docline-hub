@@ -241,7 +241,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
 
   return (
     <Ctx.Provider value={{
-      aiPause, setAiPause,
+      aiPause, setAiPause, whatsappPaused, callPaused, pauseAgent, resumeAgent,
       notifications, markAllRead,
       doctors, addDoctor, updateDoctor,
       services, addService, updateService,
