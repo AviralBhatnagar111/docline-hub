@@ -1,32 +1,34 @@
-import { Search, Bell, Sparkles, Pause, Play, MessageCircle, Phone, AlertTriangle, CalendarX, CheckCheck, Inbox, PhoneMissed } from "lucide-react";
+import { Search, Bell, Sparkles, Pause, Play, MessageCircle, Phone, AlertTriangle, CalendarX, CheckCheck, Inbox, PhoneMissed, ChevronDown } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useAppState, type AIPauseScope } from "@/lib/appState";
+import { useAppState, type AIPauseScope, type AgentKind } from "@/lib/appState";
 import { Modal } from "@/components/ui/Modal";
 import { AccountMenu } from "./AccountMenu";
 import { toast } from "sonner";
 
 export function AppHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: React.ReactNode }) {
   const { workspace } = useWorkspace();
-  const { aiPause, setAiPause, notifications, markAllRead } = useAppState();
+  const { aiPause, whatsappPaused, callPaused, pauseAgent, resumeAgent, notifications, markAllRead } = useAppState();
   const navigate = useNavigate();
   const [notifOpen, setNotifOpen] = useState(false);
   const [pauseModal, setPauseModal] = useState(false);
+  const [resumeOpen, setResumeOpen] = useState(false);
   const [scope, setScope] = useState<AIPauseScope>("all");
 
   const isPaused = aiPause !== "none";
   const unreadCount = notifications.filter((n) => n.unread).length;
 
   const handlePause = () => {
-    setAiPause(scope);
+    pauseAgent(scope);
     setPauseModal(false);
-    toast.success(`AI paused (${scope === "all" ? "all agents" : scope === "whatsapp" ? "WhatsApp" : "Call"})`);
+    toast.success(`AI paused (${scope === "all" ? "all agents" : scope === "whatsapp" ? "WhatsApp Agent" : "Call Agent"})`);
   };
 
-  const handleResume = () => {
-    setAiPause("none");
-    toast.success("AI agents resumed");
+  const handleResume = (kind: AgentKind) => {
+    resumeAgent(kind);
+    setResumeOpen(false);
+    toast.success(`${kind === "whatsapp" ? "WhatsApp" : "Call"} Agent resumed`);
   };
 
   const notifIcon = (type: string) => {
