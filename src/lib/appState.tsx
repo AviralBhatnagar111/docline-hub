@@ -183,7 +183,7 @@ interface AppStateCtx {
 const Ctx = createContext<AppStateCtx | null>(null);
 
 export function AppStateProvider({ children }: { children: ReactNode }) {
-  const [aiPause, setAiPause] = useState<AIPauseScope>("none");
+  
   const [notifications, setNotifications] = useState(seedNotifications);
   const [doctors, setDoctors] = useState(seedDoctors);
   const [services, setServices] = useState(seedServices);
