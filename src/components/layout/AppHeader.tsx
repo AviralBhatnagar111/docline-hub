@@ -180,10 +180,13 @@ export function AppHeader({ title, subtitle, actions }: { title: string; subtitl
           <div className="px-6 py-2.5 bg-warning/10 border-t border-warning/30 text-xs flex items-center gap-2">
             <Pause className="w-3.5 h-3.5 text-warning" />
             <span className="text-foreground font-semibold">
-              AI agents are paused{aiPause !== "all" && ` (${aiPause === "whatsapp" ? "WhatsApp" : "Call"})`}.
+              {aiPause === "all" ? "All AI agents are paused" : `${aiPause === "whatsapp" ? "WhatsApp Agent" : "Call Agent"} is paused`}.
             </span>
             <span className="text-foreground-muted">New patient requests will be routed to manual review.</span>
-            <button onClick={handleResume} className="ml-auto text-teal font-semibold hover:underline">Resume now</button>
+            <div className="ml-auto flex items-center gap-3">
+              {whatsappPaused && <button onClick={() => handleResume("whatsapp")} className="text-teal font-semibold hover:underline">Resume WhatsApp</button>}
+              {callPaused && <button onClick={() => handleResume("call")} className="text-teal font-semibold hover:underline">Resume Call</button>}
+            </div>
           </div>
         )}
       </header>
