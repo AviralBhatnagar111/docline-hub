@@ -1,32 +1,34 @@
-import { Search, Bell, Sparkles, Pause, Play, MessageCircle, Phone, AlertTriangle, CalendarX, CheckCheck, Inbox, PhoneMissed } from "lucide-react";
+import { Search, Bell, Sparkles, Pause, Play, MessageCircle, Phone, AlertTriangle, CalendarX, CheckCheck, Inbox, PhoneMissed, ChevronDown } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useAppState, type AIPauseScope } from "@/lib/appState";
+import { useAppState, type AIPauseScope, type AgentKind } from "@/lib/appState";
 import { Modal } from "@/components/ui/Modal";
 import { AccountMenu } from "./AccountMenu";
 import { toast } from "sonner";
 
 export function AppHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: React.ReactNode }) {
   const { workspace } = useWorkspace();
-  const { aiPause, setAiPause, notifications, markAllRead } = useAppState();
+  const { aiPause, whatsappPaused, callPaused, pauseAgent, resumeAgent, notifications, markAllRead } = useAppState();
   const navigate = useNavigate();
   const [notifOpen, setNotifOpen] = useState(false);
   const [pauseModal, setPauseModal] = useState(false);
+  const [resumeOpen, setResumeOpen] = useState(false);
   const [scope, setScope] = useState<AIPauseScope>("all");
 
   const isPaused = aiPause !== "none";
   const unreadCount = notifications.filter((n) => n.unread).length;
 
   const handlePause = () => {
-    setAiPause(scope);
+    pauseAgent(scope);
     setPauseModal(false);
-    toast.success(`AI paused (${scope === "all" ? "all agents" : scope === "whatsapp" ? "WhatsApp" : "Call"})`);
+    toast.success(`AI paused (${scope === "all" ? "all agents" : scope === "whatsapp" ? "WhatsApp Agent" : "Call Agent"})`);
   };
 
-  const handleResume = () => {
-    setAiPause("none");
-    toast.success("AI agents resumed");
+  const handleResume = (kind: AgentKind) => {
+    resumeAgent(kind);
+    setResumeOpen(false);
+    toast.success(`${kind === "whatsapp" ? "WhatsApp" : "Call"} Agent resumed`);
   };
 
   const notifIcon = (type: string) => {
@@ -71,9 +73,56 @@ export function AppHeader({ title, subtitle, actions }: { title: string; subtitl
 
           {workspace === "clinic" && (
             isPaused ? (
-              <button onClick={handleResume} className="hidden lg:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border border-warning/30 bg-warning/10 text-warning hover:bg-warning/15">
-                <Play className="w-3.5 h-3.5" /> Resume AI
-              </button>
+              <div className="relative hidden lg:block">
+                <button onClick={() => setResumeOpen((v) => !v)} className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border border-teal/30 bg-teal text-white hover:bg-teal-deep">
+                  <Play className="w-3.5 h-3.5" /> Resume AI
+                  <ChevronDown className="w-3 h-3 opacity-80" />
+                </button>
+                {resumeOpen && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setResumeOpen(false)} />
+                    <div className="absolute right-0 top-11 w-64 bg-popover border border-border rounded-xl shadow-elev z-40 animate-fade-in overflow-hidden">
+                      <div className="px-3 py-2 border-b border-border">
+                        <div className="text-[11px] font-semibold text-foreground-muted uppercase tracking-wide">Currently paused</div>
+                      </div>
+                      <div className="p-1.5">
+                        {whatsappPaused && (
+                          <button onClick={() => handleResume("whatsapp")} className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md hover:bg-muted text-left">
+                            <div className="w-7 h-7 rounded-md bg-success/10 text-success flex items-center justify-center"><MessageCircle className="w-3.5 h-3.5" /></div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs font-semibold text-foreground">Resume WhatsApp Agent</div>
+                              <div className="text-[10.5px] text-foreground-muted">Resume handling new WhatsApp messages</div>
+                            </div>
+                            <Play className="w-3.5 h-3.5 text-teal" />
+                          </button>
+                        )}
+                        {callPaused && (
+                          <button onClick={() => handleResume("call")} className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md hover:bg-muted text-left">
+                            <div className="w-7 h-7 rounded-md bg-teal/10 text-teal flex items-center justify-center"><Phone className="w-3.5 h-3.5" /></div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs font-semibold text-foreground">Resume Call Agent</div>
+                              <div className="text-[10.5px] text-foreground-muted">Resume AI voice handling</div>
+                            </div>
+                            <Play className="w-3.5 h-3.5 text-teal" />
+                          </button>
+                        )}
+                        {whatsappPaused && callPaused && (
+                          <>
+                            <div className="my-1 border-t border-border" />
+                            <button onClick={() => { resumeAgent("all"); setResumeOpen(false); toast.success("All AI agents resumed"); }} className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md hover:bg-muted text-left">
+                              <div className="w-7 h-7 rounded-md bg-muted text-foreground flex items-center justify-center"><Play className="w-3.5 h-3.5" /></div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs font-semibold text-foreground">Resume all agents</div>
+                                <div className="text-[10.5px] text-foreground-muted">Bring every channel back online</div>
+                              </div>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             ) : (
               <button onClick={() => setPauseModal(true)} className="hidden lg:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border border-border bg-card hover:bg-muted text-foreground-muted">
                 <Pause className="w-3.5 h-3.5" /> Pause AI
@@ -131,10 +180,13 @@ export function AppHeader({ title, subtitle, actions }: { title: string; subtitl
           <div className="px-6 py-2.5 bg-warning/10 border-t border-warning/30 text-xs flex items-center gap-2">
             <Pause className="w-3.5 h-3.5 text-warning" />
             <span className="text-foreground font-semibold">
-              AI agents are paused{aiPause !== "all" && ` (${aiPause === "whatsapp" ? "WhatsApp" : "Call"})`}.
+              {aiPause === "all" ? "All AI agents are paused" : `${aiPause === "whatsapp" ? "WhatsApp Agent" : "Call Agent"} is paused`}.
             </span>
             <span className="text-foreground-muted">New patient requests will be routed to manual review.</span>
-            <button onClick={handleResume} className="ml-auto text-teal font-semibold hover:underline">Resume now</button>
+            <div className="ml-auto flex items-center gap-3">
+              {whatsappPaused && <button onClick={() => handleResume("whatsapp")} className="text-teal font-semibold hover:underline">Resume WhatsApp</button>}
+              {callPaused && <button onClick={() => handleResume("call")} className="text-teal font-semibold hover:underline">Resume Call</button>}
+            </div>
           </div>
         )}
       </header>

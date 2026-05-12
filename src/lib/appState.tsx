@@ -132,9 +132,15 @@ const seedNotifications: Notification[] = [
   { id: "n8", type: "booking", title: "Onboarding request received", body: "Smile Studio Dental — Bengaluru", time: "1 hr ago", unread: true, cta: { label: "Open lead", to: "/admin/leads" } },
 ];
 
+export type AgentKind = "whatsapp" | "call";
+
 interface AppStateCtx {
   aiPause: AIPauseScope;
   setAiPause: (s: AIPauseScope) => void;
+  whatsappPaused: boolean;
+  callPaused: boolean;
+  pauseAgent: (scope: AIPauseScope) => void;
+  resumeAgent: (kind: AgentKind | "all") => void;
 
   notifications: Notification[];
   markAllRead: () => void;
@@ -177,12 +183,27 @@ interface AppStateCtx {
 const Ctx = createContext<AppStateCtx | null>(null);
 
 export function AppStateProvider({ children }: { children: ReactNode }) {
-  const [aiPause, setAiPause] = useState<AIPauseScope>("none");
+  
   const [notifications, setNotifications] = useState(seedNotifications);
   const [doctors, setDoctors] = useState(seedDoctors);
   const [services, setServices] = useState(seedServices);
   const [bookings, setBookings] = useState(seedBookings);
   const [locations, setLocations] = useState(seedLocations);
+  const [whatsappPaused, setWhatsappPaused] = useState(false);
+  const [callPaused, setCallPaused] = useState(false);
+  const aiPause: AIPauseScope = whatsappPaused && callPaused ? "all" : whatsappPaused ? "whatsapp" : callPaused ? "call" : "none";
+  const setAiPause = (s: AIPauseScope) => {
+    if (s === "none") { setWhatsappPaused(false); setCallPaused(false); return; }
+    if (s === "all") { setWhatsappPaused(true); setCallPaused(true); return; }
+    if (s === "whatsapp") setWhatsappPaused(true);
+    if (s === "call") setCallPaused(true);
+  };
+  const pauseAgent = setAiPause;
+  const resumeAgent = (kind: AgentKind | "all") => {
+    if (kind === "all") { setWhatsappPaused(false); setCallPaused(false); return; }
+    if (kind === "whatsapp") setWhatsappPaused(false);
+    if (kind === "call") setCallPaused(false);
+  };
   const [team, setTeam] = useState(seedTeam);
   const [tickets, setTickets] = useState(seedTickets);
   const [blockedSlots, setBlockedSlots] = useState<AppStateCtx["blockedSlots"]>([]);
@@ -220,7 +241,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
 
   return (
     <Ctx.Provider value={{
-      aiPause, setAiPause,
+      aiPause, setAiPause, whatsappPaused, callPaused, pauseAgent, resumeAgent,
       notifications, markAllRead,
       doctors, addDoctor, updateDoctor,
       services, addService, updateService,
