@@ -99,7 +99,7 @@ export const doctorAppointmentsSeed: DoctorAppointment[] = [
   // Recurring block: every Wednesday 14:00–16:00 — Hospital visit
   // Thu, Fri, Sat sample
   { id: "da14", patient: "Aniket Roy", phone: "+91 98201 ••77", service: "RCT review", date: "Thu, Apr 17", time: "10:30", durationMin: 30, location: "SmileCare Bandra", source: "WhatsApp Agent", status: "Confirmed", visitNumber: 2 },
-  { id: "da15", patient: "Saanvi Kapoor", phone: "+91 98700 ••81", service: "Consultation", date: "Thu, Apr 17", time: "12:00", durationMin: 30, location: "SmileCare Andheri", source: "WhatsApp Agent", status: "Reschedule" as any === "Reschedule" ? "Confirmed" : "Confirmed", visitNumber: 1 },
+  { id: "da15", patient: "Saanvi Kapoor", phone: "+91 98700 ••81", service: "Consultation", date: "Thu, Apr 17", time: "12:00", durationMin: 30, location: "SmileCare Andheri", source: "WhatsApp Agent", status: "Confirmed", visitNumber: 1 },
   { id: "da16", patient: "Riya Banerjee", phone: "+91 99800 ••56", service: "Cleaning", date: "Fri, Apr 18", time: "09:30", durationMin: 45, location: "SmileCare Bandra", source: "WhatsApp Agent", status: "Confirmed", visitNumber: 2 },
   { id: "da17", patient: "Manish Verma", phone: "+91 98330 ••11", service: "Cavity check", date: "Fri, Apr 18", time: "11:00", durationMin: 30, location: "SmileCare Bandra", source: "Manual", status: "Confirmed", visitNumber: 1 },
   { id: "da18", patient: "Pooja Iyer", phone: "+91 98444 ••39", service: "Root canal follow-up", date: "Sat, Apr 19", time: "10:00", durationMin: 30, location: "SmileCare Bandra", source: "WhatsApp Agent", status: "Confirmed", visitNumber: 3 },
