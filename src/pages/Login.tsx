@@ -1,44 +1,52 @@
 import { Link, useNavigate } from "react-router-dom";
-import { FileCheck2, Sparkles, Phone, MessagesSquare, Calendar, ArrowRight, Loader2, Building2 } from "lucide-react";
+import { FileCheck2, Sparkles, Phone, MessagesSquare, Calendar, ArrowRight, Loader2, Building2, Stethoscope, X, LifeBuoy } from "lucide-react";
 import { useState } from "react";
 import { useWorkspace } from "@/lib/workspace";
 import { OnboardingRequestModal } from "@/components/auth/OnboardingRequestModal";
 import { GoogleSignInModal } from "@/components/auth/GoogleSignInModal";
+import { Modal } from "@/components/ui/Modal";
+
+type Tab = "clinic" | "doctor" | "internal";
 
 export default function Login() {
   const navigate = useNavigate();
   const { setWorkspace, setRole } = useWorkspace();
-  const [tab, setTab] = useState<"clinic" | "internal">("clinic");
+  const [tab, setTab] = useState<Tab>("clinic");
   const [loading, setLoading] = useState(false);
   const [onboardOpen, setOnboardOpen] = useState(false);
   const [googleOpen, setGoogleOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
+
+  const route = (t: Tab) =>
+    t === "clinic" ? "/app" : t === "doctor" ? "/doctor" : "/admin";
+
+  const apply = (t: Tab) => {
+    setWorkspace(t);
+    setRole(t === "clinic" ? "owner" : t === "doctor" ? "doctor" : "platform_admin");
+  };
 
   const enter = (delay = 0) => {
     setLoading(true);
-    setTimeout(() => {
-      setWorkspace(tab);
-      setRole(tab === "clinic" ? "owner" : "platform_admin");
-      navigate(tab === "clinic" ? "/app" : "/admin");
-    }, delay);
+    setTimeout(() => { apply(tab); navigate(route(tab)); }, delay);
   };
 
-  const onGoogleComplete = () => {
-    setWorkspace(tab);
-    setRole(tab === "clinic" ? "owner" : "platform_admin");
-    navigate(tab === "clinic" ? "/app" : "/admin");
-  };
+  const onGoogleComplete = () => { apply(tab); navigate(route(tab)); };
+
+  const defaultEmail = tab === "clinic"
+    ? "anaya@smilecareclinic.com"
+    : tab === "doctor"
+    ? "arjun.mehta@smilecareclinic.com"
+    : "admin@appointnowx.com";
+
+  const ctaLabel = tab === "clinic" ? "Clinic Hub" : tab === "doctor" ? "Doctor Dashboard" : "Internal Console";
 
   return (
     <div className="min-h-screen flex bg-background">
       <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-gradient-brand text-white">
-        <div className="absolute inset-0 opacity-30" style={{
-          backgroundImage: "radial-gradient(circle at 20% 20%, hsl(176 86% 45% / 0.4), transparent 50%), radial-gradient(circle at 80% 80%, hsl(176 60% 60% / 0.3), transparent 50%)",
-        }}/>
+        <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, hsl(176 86% 45% / 0.4), transparent 50%), radial-gradient(circle at 80% 80%, hsl(176 60% 60% / 0.3), transparent 50%)" }} />
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center">
-              <FileCheck2 className="w-6 h-6" />
-            </div>
+            <div className="w-11 h-11 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center"><FileCheck2 className="w-6 h-6" /></div>
             <div>
               <div className="font-display font-bold text-xl">AppointNowX</div>
               <div className="text-xs text-white/70">AI Front-Desk for Dental Clinics</div>
@@ -80,19 +88,21 @@ export default function Login() {
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2.5 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-gradient-teal flex items-center justify-center">
-              <FileCheck2 className="w-5 h-5 text-white" />
-            </div>
+            <div className="w-10 h-10 rounded-xl bg-gradient-teal flex items-center justify-center"><FileCheck2 className="w-5 h-5 text-white" /></div>
             <span className="font-display font-bold text-lg text-foreground">AppointNowX</span>
           </div>
 
           <h1 className="text-2xl font-display font-bold text-foreground">Sign in to continue</h1>
           <p className="text-sm text-foreground-muted mt-1.5">Choose your workspace to get started.</p>
 
-          <div className="mt-6 grid grid-cols-2 p-1 rounded-lg bg-muted">
-            {(["clinic", "internal"] as const).map((t) => (
-              <button key={t} onClick={() => setTab(t)} className={`text-xs font-semibold py-2 rounded-md transition ${tab === t ? "bg-card shadow-soft text-foreground" : "text-foreground-muted"}`}>
-                {t === "clinic" ? "Clinic Hub" : "Internal Console"}
+          <div className="mt-6 grid grid-cols-3 p-1 rounded-lg bg-muted">
+            {([
+              { v: "clinic", l: "Clinic Hub" },
+              { v: "doctor", l: "Doctor" },
+              { v: "internal", l: "Internal Console" },
+            ] as { v: Tab; l: string }[]).map((t) => (
+              <button key={t.v} onClick={() => setTab(t.v)} className={`text-xs font-semibold py-2 rounded-md transition ${tab === t.v ? "bg-card shadow-soft text-foreground" : "text-foreground-muted"}`}>
+                {t.l}
               </button>
             ))}
           </div>
@@ -100,7 +110,7 @@ export default function Login() {
           <form onSubmit={(e) => { e.preventDefault(); enter(400); }} className="mt-6 space-y-4">
             <div>
               <label className="text-xs font-semibold text-foreground-muted">Work email</label>
-              <input defaultValue={tab === "clinic" ? "anaya@smilecareclinic.com" : "admin@appointnowx.com"} className="mt-1.5 w-full px-3.5 py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal" />
+              <input key={tab} defaultValue={defaultEmail} className="mt-1.5 w-full px-3.5 py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal" />
             </div>
             <div>
               <label className="text-xs font-semibold text-foreground-muted">Password</label>
@@ -115,7 +125,7 @@ export default function Login() {
             </div>
 
             <button type="submit" disabled={loading} className="w-full bg-gradient-brand text-white text-sm font-semibold py-3 rounded-lg shadow-soft hover:opacity-95 inline-flex items-center justify-center gap-2 disabled:opacity-70">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Continue to {tab === "clinic" ? "Clinic Hub" : "Internal Console"} <ArrowRight className="w-4 h-4" /></>}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Continue to {ctaLabel} <ArrowRight className="w-4 h-4" /></>}
             </button>
 
             <button type="button" onClick={() => setGoogleOpen(true)} className="w-full bg-card text-foreground border border-border text-sm font-semibold py-2.5 rounded-lg hover:bg-muted inline-flex items-center justify-center gap-2.5">
@@ -124,15 +134,45 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="text-xs text-foreground-muted mt-6 text-center">
-            New clinic?{" "}
-            <button onClick={() => setOnboardOpen(true)} className="text-teal font-semibold hover:underline">Request onboarding</button>
-          </p>
+          {tab === "clinic" && (
+            <p className="text-xs text-foreground-muted mt-6 text-center">
+              New clinic?{" "}
+              <button onClick={() => setOnboardOpen(true)} className="text-teal font-semibold hover:underline">Request onboarding</button>
+            </p>
+          )}
+          {tab === "doctor" && (
+            <div className="mt-6 p-3.5 rounded-lg bg-surface border border-border text-[11.5px] text-foreground-muted leading-relaxed">
+              <div className="flex items-start gap-2">
+                <Stethoscope className="w-3.5 h-3.5 text-teal mt-0.5 shrink-0" />
+                <div>
+                  Not added yet? Ask your clinic admin to add you as a doctor in their AppointNowX workspace.{" "}
+                  <button onClick={() => setInfoOpen(true)} className="text-teal font-semibold hover:underline">Learn more</button>
+                </div>
+              </div>
+            </div>
+          )}
+          {tab === "internal" && (
+            <p className="text-xs text-foreground-muted mt-6 text-center">
+              Internal team access only. <Link to="#" className="text-teal font-semibold hover:underline">Contact admin</Link>
+            </p>
+          )}
         </div>
       </div>
 
       <OnboardingRequestModal open={onboardOpen} onClose={() => setOnboardOpen(false)} />
       <GoogleSignInModal open={googleOpen} onClose={() => setGoogleOpen(false)} mode={tab} onComplete={onGoogleComplete} />
+
+      <Modal open={infoOpen} onClose={() => setInfoOpen(false)} size="sm" title="How doctors are added to AppointNowX"
+        footer={
+          <>
+            <button onClick={() => setInfoOpen(false)} className="text-xs font-semibold px-3.5 py-2 rounded-lg border border-border bg-card hover:bg-muted">Close</button>
+            <a href="mailto:support@appointnowx.com" className="text-xs font-semibold px-3.5 py-2 rounded-lg bg-gradient-brand text-white inline-flex items-center gap-1.5"><LifeBuoy className="w-3.5 h-3.5" /> Contact support</a>
+          </>
+        }>
+        <p className="text-sm text-foreground-muted leading-relaxed">
+          Doctors are added by their clinic admin from the Doctors section of the Clinic Hub. Once added, you will receive an email or WhatsApp invite with a sign-in link. If you cannot reach your clinic admin, write to support@appointnowx.com and our team will help.
+        </p>
+      </Modal>
     </div>
   );
 }

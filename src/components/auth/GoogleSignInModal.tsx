@@ -1,40 +1,45 @@
 import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
-import { Loader2, ArrowLeft, UserPlus, Building2 } from "lucide-react";
+import { Loader2, ArrowLeft, UserPlus, Building2, Stethoscope, MapPin } from "lucide-react";
 
 const GoogleLogo = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.99.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.09a6.6 6.6 0 0 1 0-4.18V7.07H2.18a11 11 0 0 0 0 9.86l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.07l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>
 );
 
-type Account = { name: string; email: string; initials: string; color: string; workspace: string; role: string };
+export type Account = {
+  name: string; email: string; initials: string; color: string;
+  workspace: string; role: string;
+  specialty?: string; locations?: string[];
+};
 
 const CLINIC_ACCOUNTS: Account[] = [
   { name: "Anaya Kapoor", email: "anaya@smilecareclinic.com", initials: "AK", color: "bg-teal/20 text-teal", workspace: "SmileCare Dental", role: "Practice Owner" },
   { name: "Priya Nair", email: "priya@smilecareclinic.com", initials: "PN", color: "bg-primary/15 text-primary", workspace: "SmileCare Dental", role: "Front Desk" },
 ];
+const DOCTOR_ACCOUNTS: Account[] = [
+  { name: "Dr. Arjun Mehta", email: "arjun.mehta@smilecareclinic.com", initials: "AM", color: "bg-teal/20 text-teal", workspace: "SmileCare Dental", role: "Doctor", specialty: "Endodontist", locations: ["SmileCare Bandra", "SmileCare Andheri"] },
+  { name: "Dr. Riya Kapoor", email: "riya.kapoor@smilecareclinic.com", initials: "RK", color: "bg-primary/15 text-primary", workspace: "SmileCare Dental", role: "Doctor", specialty: "Orthodontist", locations: ["SmileCare Bandra"] },
+];
 const INTERNAL_ACCOUNT: Account = { name: "Ops Admin", email: "admin@appointnowx.com", initials: "OA", color: "bg-warning/20 text-warning", workspace: "AppointNowX Internal", role: "Platform Admin" };
 
 export function GoogleSignInModal({ open, onClose, mode, onComplete }: {
-  open: boolean; onClose: () => void; mode: "clinic" | "internal";
+  open: boolean; onClose: () => void; mode: "clinic" | "internal" | "doctor";
   onComplete: (acc: Account) => void;
 }) {
   const [step, setStep] = useState<"choose" | "confirm" | "loading">("choose");
   const [selected, setSelected] = useState<Account | null>(null);
 
-  const accounts = mode === "clinic" ? CLINIC_ACCOUNTS : [INTERNAL_ACCOUNT];
+  const accounts = mode === "clinic" ? CLINIC_ACCOUNTS : mode === "doctor" ? DOCTOR_ACCOUNTS : [INTERNAL_ACCOUNT];
+  const destination = mode === "doctor" ? "your Doctor Dashboard" : "AppointNowX";
 
   const close = () => { onClose(); setTimeout(() => { setStep("choose"); setSelected(null); }, 250); };
-
   const pick = (a: Account) => { setSelected(a); setStep("confirm"); };
-  const proceed = () => {
-    setStep("loading");
-    setTimeout(() => { onComplete(selected!); close(); }, 800);
-  };
+  const proceed = () => { setStep("loading"); setTimeout(() => { onComplete(selected!); close(); }, 800); };
 
   return (
     <Modal open={open} onClose={close} size="sm"
       title={step === "choose" ? "Choose an account" : step === "confirm" ? "Continue to AppointNowX" : "Signing you in"}
-      subtitle={step === "choose" ? "to continue to AppointNowX" : step === "confirm" ? "AppointNowX will use your account to sign you in." : undefined}
+      subtitle={step === "choose" ? "to continue to AppointNowX" : step === "confirm" ? `AppointNowX will use your account to sign you in to ${destination}.` : undefined}
     >
       {step === "choose" && (
         <div className="-mx-1">
@@ -79,6 +84,20 @@ export function GoogleSignInModal({ open, onClose, mode, onComplete }: {
               <span className="text-foreground-muted">Role detected</span>
               <span className="ml-auto font-semibold text-foreground">{selected.role}</span>
             </div>
+            {selected.specialty && (
+              <div className="flex items-center gap-2 text-xs">
+                <Stethoscope className="w-3.5 h-3.5 text-teal" />
+                <span className="text-foreground-muted">Specialty detected</span>
+                <span className="ml-auto font-semibold text-foreground">{selected.specialty}</span>
+              </div>
+            )}
+            {selected.locations && (
+              <div className="flex items-start gap-2 text-xs">
+                <MapPin className="w-3.5 h-3.5 text-teal mt-0.5" />
+                <span className="text-foreground-muted">Locations</span>
+                <span className="ml-auto font-semibold text-foreground text-right">{selected.locations.join(", ")}</span>
+              </div>
+            )}
           </div>
           <p className="text-[11px] text-foreground-muted">By continuing, AppointNowX will access your name, email and profile picture for sign-in.</p>
           <div className="flex items-center justify-end gap-2 pt-1">
@@ -99,5 +118,3 @@ export function GoogleSignInModal({ open, onClose, mode, onComplete }: {
     </Modal>
   );
 }
-
-export type { Account };
