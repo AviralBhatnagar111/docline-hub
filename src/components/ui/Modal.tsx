@@ -20,7 +20,7 @@ export function Modal({
   if (!open) return null;
   const widths = { sm: "max-w-md", md: "max-w-lg", lg: "max-w-2xl" };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-fade-in">
       <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" onClick={onClose} />
       <div className={`relative w-full ${widths[size]} bg-card rounded-xl shadow-elev border border-border max-h-[90vh] flex flex-col`}>
@@ -36,7 +36,8 @@ export function Modal({
         <div className="p-5 overflow-y-auto flex-1 scroll-clean">{children}</div>
         {footer && <div className="p-4 border-t border-border bg-surface/50 flex items-center justify-end gap-2">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
