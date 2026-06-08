@@ -37,6 +37,8 @@ import DoctorConversations from "./pages/doctor/Conversations";
 import DoctorEmergency from "./pages/doctor/Emergency";
 import DoctorAvailability from "./pages/doctor/Availability";
 import DoctorProfile from "./pages/doctor/Profile";
+import TeleRoom from "./pages/Tele";
+
 
 const queryClient = new QueryClient();
 
@@ -87,7 +89,11 @@ const App = () => (
                 <Route path="/doctor/availability" element={<DoctorAvailability />} />
                 <Route path="/doctor/profile" element={<DoctorProfile />} />
 
+                {/* Tele-consult room (shared) */}
+                <Route path="/tele/:id" element={<TeleRoom />} />
+
                 <Route path="*" element={<NotFound />} />
+
               </Routes>
             </BrowserRouter>
           </DoctorStateProvider>
